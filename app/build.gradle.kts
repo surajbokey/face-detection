@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -49,6 +52,30 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.exifinterface)
+    kapt(libs.hilt.compiler)
+
+    // Hilt and Compose Integration
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // Accompanist Permissions
+    implementation(libs.accompanist.permissions)
+
+    // Coil for image loading
+    implementation(libs.coil.compose)
+
+    // Coroutine
+    implementation(libs.kotlinx.coroutines.android)
+
+    // Mediapipe (Placeholder - adjust version and dependency as needed)
+    implementation(libs.tasks.vision)
+
+    // Data store
+    implementation(libs.androidx.datastore.preferences)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
