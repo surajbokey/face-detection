@@ -8,7 +8,7 @@ import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
 import android.provider.MediaStore
-import com.surajbokey.facedetection.tagging.FaceDetectorHelper
+import com.surajbokey.facedetection.detection.FaceDetectorHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,14 +19,13 @@ class GalleryDataSourceImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val helper: FaceDetectorHelper
 ) : GalleryDataSource {
-    override suspend fun getGalleryImages(): List<Uri> = withContext(Dispatchers.IO) {
+    override suspend fun getGalleryImageUris(): List<Uri> = withContext(Dispatchers.IO) {
         val uris = mutableListOf<Uri>()
         val projection = arrayOf(MediaStore.Images.Media._ID)
         val cursor = context.contentResolver.query(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             projection, null, null, null
         )
-        var counter = 0
         cursor?.use {
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             while (cursor.moveToNext()) {
@@ -34,26 +33,19 @@ class GalleryDataSourceImpl @Inject constructor(
                 val contentUri = ContentUris.withAppendedId(
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id
                 )
-                val bitmap = loadBitmap(contentUri)
-                val faces =
-                    helper.detectImage(bitmap)?.detections()?.size ?: 0
-                if (faces > 0) {
-                    uris.add(contentUri)
-                }
-                if (++counter >= 30) break
+                uris.add(contentUri)
             }
         }
         return@withContext uris
     }
 
-    override suspend fun loadBitmap(uri: Uri): Bitmap {
+    override suspend fun getBitmap(uri: Uri): Bitmap {
         return withContext(Dispatchers.IO) {
             val inputStream = context.contentResolver.openInputStream(uri)
             val bitmap = inputStream?.use {
                 BitmapFactory.decodeStream(it)
             } ?: throw IOException("Cannot load bitmap")
 
-            // Read EXIF data
             val exifInputStream = context.contentResolver.openInputStream(uri)
             val exif = exifInputStream?.use { ExifInterface(it) }
 
@@ -62,7 +54,6 @@ class GalleryDataSourceImpl @Inject constructor(
                 ExifInterface.ORIENTATION_NORMAL
             ) ?: ExifInterface.ORIENTATION_NORMAL
 
-            // Rotate bitmap if needed
             val rotatedBitmap = when (orientation) {
                 ExifInterface.ORIENTATION_ROTATE_90 -> rotateBitmap(bitmap, 90f)
                 ExifInterface.ORIENTATION_ROTATE_180 -> rotateBitmap(bitmap, 180f)

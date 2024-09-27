@@ -15,6 +15,10 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -34,11 +38,13 @@ fun PermissionScreen(onPermissionGranted: () -> Unit) {
 
     when {
         permissionState.status.isGranted -> {
-            onPermissionGranted.invoke()
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(500L)
+                onPermissionGranted.invoke()
+            }
         }
 
         permissionState.status.shouldShowRationale -> {
-            // Show rationale and request permission
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
@@ -52,7 +58,7 @@ fun PermissionScreen(onPermissionGranted: () -> Unit) {
         }
 
         else -> {
-            Text("Permission denied. Please enable it from settings.")
+            Text("")
         }
     }
 }

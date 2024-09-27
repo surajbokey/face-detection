@@ -4,6 +4,6 @@ import android.graphics.Bitmap
 import android.net.Uri
 
 interface GalleryDataSource {
-    suspend fun getGalleryImages(): List<Uri>
-    suspend fun loadBitmap(uri: Uri): Bitmap
+    suspend fun getGalleryImageUris(): List<Uri>
+    suspend fun getBitmap(uri: Uri): Bitmap
 }

@@ -1,9 +1,9 @@
 package com.surajbokey.facedetection
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -31,30 +31,54 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+
     NavHost(
         navController = navController,
-        startDestination = "gallery"
+        startDestination = Screen.Permission.route
     ) {
-        composable("permission") {
-            PermissionScreen(onPermissionGranted = {
-                navController.navigate("gallery") {
-                    popUpTo("permission") { inclusive = true }
+        composable(Screen.Permission.route) {
+            PermissionScreen(
+                onPermissionGranted = {
+                    navController.navigate(Screen.Gallery.route) {
+                        popUpTo(Screen.Permission.route) { inclusive = true }
+                    }
                 }
-            })
+            )
         }
-        composable("gallery") {
-            GalleryScreen(onImageSelected = { uri ->
-                navController.navigate("faceDetection?imageUri=${uri}") {
-                    launchSingleTop = true
+
+        composable(Screen.Gallery.route) {
+            GalleryScreen(
+                onImageSelected = { uri ->
+                    val encodedUri = Uri.encode(uri.toString())
+                    navController.navigate("${Screen.FaceDetection.route}?${Arguments.IMAGE_URI}=$encodedUri") {
+                        launchSingleTop = true
+                    }
                 }
-            })
+            )
         }
+
         composable(
-            "faceDetection?imageUri={imageUri}",
-            arguments = listOf(navArgument("imageUri") { type = NavType.StringType })
+            route = "${Screen.FaceDetection.route}?${Arguments.IMAGE_URI}={${Arguments.IMAGE_URI}}",
+            arguments = listOf(
+                navArgument(Arguments.IMAGE_URI) {
+                    type = NavType.StringType
+                    nullable = true
+                }
+            )
         ) { backStackEntry ->
-            val imageUri = backStackEntry.arguments?.getString("imageUri")
-            FaceDetectionScreen(imageUri = imageUri)
+            val imageUriString = backStackEntry.arguments?.getString(Arguments.IMAGE_URI)
+            val imageUri = imageUriString?.let { Uri.parse(it) }
+            FaceDetectionScreen(imageUri = imageUriString)
         }
     }
+}
+
+sealed class Screen(val route: String) {
+    data object Permission : Screen("permission")
+    data object Gallery : Screen("gallery")
+    data object FaceDetection : Screen("faceDetection")
+}
+
+object Arguments {
+    const val IMAGE_URI = "imageUri"
 }

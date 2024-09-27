@@ -3,7 +3,7 @@ package com.surajbokey.facedetection.detection.data
 import android.graphics.Bitmap
 import android.net.Uri
 import com.surajbokey.facedetection.detection.domain.model.DetectedFace
-import com.surajbokey.facedetection.tagging.FaceDetectorHelper
+import com.surajbokey.facedetection.detection.FaceDetectorHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

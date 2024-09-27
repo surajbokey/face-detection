@@ -7,7 +7,7 @@ import com.surajbokey.facedetection.detection.domain.FaceDetectionRepository
 import com.surajbokey.facedetection.gallery.data.GalleryDataSource
 import com.surajbokey.facedetection.gallery.data.GalleryDataSourceImpl
 import com.surajbokey.facedetection.gallery.data.GalleryRepositoryImpl
-import com.surajbokey.facedetection.gallery.domain.models.GalleryRepository
+import com.surajbokey.facedetection.gallery.domain.GalleryRepository
 import com.surajbokey.facedetection.permission.data.PermissionRepositoryImpl
 import com.surajbokey.facedetection.permission.domain.PermissionRepository
 import com.surajbokey.facedetection.tagging.data.FaceTagRepositoryImpl
@@ -16,7 +16,6 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
